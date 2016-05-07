@@ -9,11 +9,13 @@ package blokusgui;
  * @author tomoki-n
  */
 import java.awt.Color;
+import java.awt.Point;
 
 public class BlokusPiecePanel extends javax.swing.JPanel {
 
     private static final Color[] playerColor = { new Color(255,51,51), new Color(153,153,255) };
     private static final Color noplayer = Color.white;
+    public Point point = new Point();
     /**
      * Creates new form BlokusPiecePanel
      */
@@ -55,5 +57,15 @@ public class BlokusPiecePanel extends javax.swing.JPanel {
     }// </editor-fold>                        
     // Variables declaration - do not modify                     
     // End of variables declaration                   
+
+    public void setpoint(int i, int j) {
+   
+       this.point.x = i;
+       this.point.y = j;
+    
+    }
+    public Point getpoint(){
+        return this.point;
+    }
 }
 

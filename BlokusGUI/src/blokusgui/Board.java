@@ -25,10 +25,12 @@ import java.util.HashMap;
  */
 public class Board {
     public static final int BOARDSIZE = 15;
+    public static final int DEFAULT_RESOLUTION = 550;
     public static final int PLAYER_COUNT = 2;
     public static final Point PLAYER_0_START = new Point(0,0);
     public static final Point PLAYER_1_START = new Point(14,14);
-    
+
+       
     private int[][] boardState;
     //各プレイヤーが設置済みのピース（同じ物は置けない）
     private ArrayList<ArrayList<String>> PlayerPutPieces;
@@ -320,5 +322,7 @@ public class Board {
     }
 
 
+    
+    
     
 }

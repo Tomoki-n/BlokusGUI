@@ -7,6 +7,8 @@ package blokusgui;
 
 
 
+import static blokusgui.Board.BOARDSIZE;
+import java.awt.Point;
 import java.util.Observable;
 
 /**
@@ -167,5 +169,8 @@ public class Game extends Observable{
         this.notifyObservers(text);
     }
     
+    public Point getCoordinates(Point pixel, int res){
+        return new Point(pixel.x / (res / gameBoard.BOARDSIZE), pixel.y / (res / gameBoard.BOARDSIZE));
+    } 
    
 }

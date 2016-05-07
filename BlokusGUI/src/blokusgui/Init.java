@@ -102,11 +102,11 @@ public class Init extends javax.swing.JDialog {
     }
 
     public void OKButtonPressed(ActionEvent e) throws IOException {
-
-       GamePanels panel = new GamePanels();
+       Game game = new Game();
+       GamePanels panel = new GamePanels(game);
        panel.setVisible(true);
        
-       Game game = new Game();
+       
        this.setVisible(false);
     }
 

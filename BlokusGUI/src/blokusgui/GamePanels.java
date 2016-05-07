@@ -12,9 +12,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -37,82 +43,104 @@ import javax.swing.border.BevelBorder;
  * @author tomoki-n
  */
 public class GamePanels extends javax.swing.JFrame implements Observer {
+
     public BlokusPiecePanel[][] boardPanels;
+    //public BlokusPiecePanel[][] overlayPanels;
+    
     public int pieceIndex;
-       
+    public Game game;
     public final String TitleString = "BlokusGUI";
     public final String VerString = "0.1";
-   
+    public Point selected;
+
     BlokusPieceLabel label0[] = new BlokusPieceLabel[25];
     BlokusPieceLabel label1[] = new BlokusPieceLabel[25];
-    
+
     /**
      * Creates new form GamePanels
      */
-    public GamePanels() throws IOException {
+    public GamePanels(Game game) throws IOException {
         initComponents();
         init();
-         this.setTitle(TitleString + " ver."+VerString);
-         this.setText("起動が完了しました");
+        this.game = game;
+        this.setTitle(TitleString + " ver." + VerString);
+        this.setText("起動が完了しました");
     }
-    
-    
-    public void init() throws IOException{
+
+    public void init() throws IOException {
         //this.messageDialog = new TextMessageDialog(this,false);
         //this.showMessageDialog();
-       
+        BoardClickListener bcl = new BoardClickListener();      
         this.showRedPlayerPanel();
         this.showBluePlayerPanel();
         
+        jPanel5 = new javax.swing.JPanel();
+        
+        jPanel5.setPreferredSize(new java.awt.Dimension(600, 600));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 550, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 550, Short.MAX_VALUE)
+        );
+        
         this.boardPanels = new BlokusPiecePanel[Board.BOARDSIZE][Board.BOARDSIZE];
-            this.jPanel4.setLayout(new GridLayout(Board.BOARDSIZE,Board.BOARDSIZE));
-        for(int i=0;i<Board.BOARDSIZE;i++){
-            for(int j=0;j<Board.BOARDSIZE;j++){
+        this.jPanel4.setLayout(new GridLayout(Board.BOARDSIZE, Board.BOARDSIZE));
+        this.jPanel5.setBackground(Color.BLACK);
+        for (int i = 0; i < Board.BOARDSIZE; i++) {
+            for (int j = 0; j < Board.BOARDSIZE; j++) {
                 boardPanels[i][j] = new BlokusPiecePanel();
-                this.jPanel4.add(boardPanels[i][j]);
+                boardPanels[i][j].setpoint(i, j);
+                boardPanels[i][j].addMouseListener(bcl);
+                boardPanels[i][j].addMouseMotionListener(bcl);
+                boardPanels[i][j].addMouseWheelListener(bcl);
+                this.jPanel4.add(boardPanels[i][j]); 
             }
         }
-        
-      
-    }
-    
-    public void showRedPlayerPanel() throws IOException{
-         this.jPanel1.setLayout(new GridLayout(5, 5, 3, 3));
 
-          for (int i = 1; i <= 21; i++) {
+    }
+
+    public void showRedPlayerPanel() throws IOException {
+        this.jPanel1.setLayout(new GridLayout(5, 5, 3, 3));
+
+        for (int i = 1; i <= 21; i++) {
             //JLabel l = new JLabel("" + i, JLabel.CENTER);
             String a = "./images/r";
             String b = a + String.valueOf(i) + ".png";
             System.out.println(b);
-                   
-            label0[i-1] = new BlokusPieceLabel(i-1,resizeByScaledInstance(b,50,50), JLabel.CENTER);
-            label0[i-1].setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            label0[i-1].setFont(label0[i-1].getFont().deriveFont(20f));
-            label0[i-1].addMouseListener(new PieceLabelClickListener());
-            this.jPanel1.add(label0[i-1]);
+
+            label0[i - 1] = new BlokusPieceLabel(i - 1, resizeByScaledInstance(b, 50, 50), JLabel.CENTER);
+            label0[i - 1].setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            label0[i - 1].setFont(label0[i - 1].getFont().deriveFont(20f));
+            label0[i - 1].addMouseListener(new PieceLabelClickListener());
+            this.jPanel1.add(label0[i - 1]);
         }
-        
+
     }
-    public void showBluePlayerPanel() throws IOException{
+
+    public void showBluePlayerPanel() throws IOException {
         this.jPanel3.setLayout(new GridLayout(5, 5, 3, 3));
 
-         for (int i = 1; i <= 21; i++) {
+        for (int i = 1; i <= 21; i++) {
             String a = "./images/b";
             String b = a + String.valueOf(i) + ".png";
             System.out.println(b);
             //JLabel l = new JLabel("" + i, JLabel.CENTER);
-            label1[i-1] = new BlokusPieceLabel(i-1,resizeByScaledInstance(b,50,50), JLabel.CENTER);
-            label1[i-1].setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            label1[i-1].setFont(label1[i-1].getFont().deriveFont(20f));
-            label1[i-1].addMouseListener(new PieceLabelClickListener1());
-            this.jPanel3.add(label1[i-1]);
+            label1[i - 1] = new BlokusPieceLabel(i - 1, resizeByScaledInstance(b, 50, 50), JLabel.CENTER);
+            label1[i - 1].setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            label1[i - 1].setFont(label1[i - 1].getFont().deriveFont(20f));
+            label1[i - 1].addMouseListener(new PieceLabelClickListener1());
+            this.jPanel3.add(label1[i - 1]);
         }
-        
-        
-    }   
-    
-    
-     public static BufferedImage resizeByScaledInstance(String inputPath, int maxWidth, int maxHeight)
+
+    }
+
+    public static BufferedImage resizeByScaledInstance(String inputPath, int maxWidth, int maxHeight)
             throws IOException {
 
         // 元画像の読み込み
@@ -126,8 +154,7 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
         // 縦横比は変えずに最大幅、最大高さを超えないように比率を指定する
         if (bdH.compareTo(bdW) < 0) {
             maxWidth = -1;
-        }
-        else {
+        } else {
             maxHeight = -1;
         }
 
@@ -142,12 +169,12 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
         // Image -> BufferedImageの変換
         BufferedImage targetBufferedImage = new BufferedImage(targetImage.getWidth(null), targetImage.getHeight(null),
                 BufferedImage.TYPE_INT_RGB);
-        
+
         Graphics2D g = targetBufferedImage.createGraphics();
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
-Rectangle2D.Double rect = new Rectangle2D.Double(0,0,targetBufferedImage.getHeight(),targetBufferedImage.getHeight());
-g.fill(rect);
-g.setPaintMode();
+        Rectangle2D.Double rect = new Rectangle2D.Double(0, 0, targetBufferedImage.getHeight(), targetBufferedImage.getHeight());
+        g.fill(rect);
+        g.setPaintMode();
         g.drawImage(targetImage, 0, 0, null);
 
         // 拡張子取得
@@ -157,10 +184,9 @@ g.setPaintMode();
         return targetBufferedImage;
     }
 
-    
     /**
-     * 
-     * 
+     *
+     *
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
@@ -250,8 +276,7 @@ g.setPaintMode();
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel4))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(249, 249, 249))
@@ -328,53 +353,14 @@ g.setPaintMode();
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GamePanels.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GamePanels.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GamePanels.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GamePanels.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new GamePanels().setVisible(true);
-                } catch (IOException ex) {
-                    Logger.getLogger(GamePanels.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-    }
-
-     public void addText(String string) {
-        this.jTextArea1.setText(this.jTextArea1.getText()+"\n"+string);
+    public void addText(String string) {
+        this.jTextArea1.setText(this.jTextArea1.getText() + "\n" + string);
     }
 
     private void setText(String string) {
         this.jTextArea1.setText(string);
     }
-    
+
     private void drawBorder() {
         JComponent piece = (JComponent) jPanel1.getComponent(pieceIndex);
         piece.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
@@ -394,24 +380,28 @@ g.setPaintMode();
         JComponent piece = (JComponent) jPanel3.getComponent(pieceIndex);
         piece.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     }
-    
-     private class PieceLabelClickListener implements MouseListener {
-           
+
+    public void drawboard() {
+
+    }
+
+    private class PieceLabelClickListener implements MouseListener {
+
         @Override
         public void mousePressed(MouseEvent e) {
             BlokusPieceLabel bp = (BlokusPieceLabel) e.getComponent();
-                clearBorder();
-                pieceIndex = bp.pieceIndex;
-                drawBorder();
+            clearBorder();
+            pieceIndex = bp.pieceIndex;
+            drawBorder();
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            }
+        }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-         }
+        }
 
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -421,24 +411,25 @@ g.setPaintMode();
         public void mouseExited(MouseEvent e) {
         }
 
-     }
-        private class PieceLabelClickListener1 implements MouseListener {
-           
+    }
+
+    private class PieceLabelClickListener1 implements MouseListener {
+
         @Override
         public void mousePressed(MouseEvent e) {
             BlokusPieceLabel bp = (BlokusPieceLabel) e.getComponent();
-                clearBorder1();
-                pieceIndex = bp.pieceIndex;
-                drawBorder1();
+            clearBorder1();
+            pieceIndex = bp.pieceIndex;
+            drawBorder1();
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            }
+        }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-         }
+        }
 
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -448,7 +439,77 @@ g.setPaintMode();
         public void mouseExited(MouseEvent e) {
         }
 
-     }
+    }
+
+    class SurrenderListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+
+    class BoardClickListener implements MouseListener, MouseMotionListener, MouseWheelListener {
+
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON3) {
+              //  flipPiece();
+            } else {
+                //try {
+//                    board.placePiece(players[turn].pieces.get(
+//                            pieceIndex), selected.x - Piece.SHAPE_SIZE / 2,
+//                            selected.y - Piece.SHAPE_SIZE / 2, players[turn].firstMove);
+//                    drawBoard();
+//                    players[turn].pieces.remove(pieceIndex);
+//                    players[turn].firstMove = false;
+//                    players[turn].canPlay = players[turn].pieces.size() != 0;
+//                    startNewTurn();
+//                } catch (Board.IllegalMoveException ex) {
+//                    displayMessage(ex.getMessage(), "Illegal Move!");
+//                }
+            }
+            
+        }
+
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        public void mouseExited(MouseEvent e) {
+            selected = null;
+          //  board.resetOverlay();
+            //drawBoard();
+        }
+
+        public void mouseDragged(MouseEvent e) {
+
+        }
+
+        public void mouseMoved(MouseEvent e) {
+                BlokusPiecePanel bp = (BlokusPiecePanel) e.getComponent();
+                selected = bp.getpoint();
+                
+        }
+
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            if (e.getWheelRotation() > 0) {
+            //    rotateClockwise();
+            } else {
+              //  rotateCounterClockwise();
+            }
+        }
+
+    }
+
+    private javax.swing.JPanel jPanel5;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
