@@ -42,6 +42,8 @@ public class Piece {
             this.direction = d;
         }
     }
+
+    
     
     /** 現在のピースの形状を返す */
     public int[][] getPiecePattern() {

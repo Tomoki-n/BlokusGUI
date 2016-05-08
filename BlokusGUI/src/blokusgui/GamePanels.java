@@ -5,6 +5,7 @@
  */
 package blokusgui;
 
+import static blokusgui.Piece.PieceList;
 import static blokusgui.PlayerPiecePanel.resizeByScaledInstance;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -26,6 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
@@ -46,16 +49,24 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
 
     public BlokusPiecePanel[][] boardPanels;
     //public BlokusPiecePanel[][] overlayPanels;
+    public int boardpiecepanel[][] = new int[Board.BOARDSIZE][Board.BOARDSIZE];
+    public int overlaypiecepanel[][] = new int[Board.BOARDSIZE][Board.BOARDSIZE];
+    
+    //自分が利用したピース一覧
+    private ArrayList<String> usedPeices;
+    //自分がまだ使えるピース一覧
+    private ArrayList<String> havingPeices;
     
     public int pieceIndex;
     public Game game;
     public final String TitleString = "BlokusGUI";
     public final String VerString = "0.1";
-    public Point selected;
-
+    public Point selected = new Point();
     BlokusPieceLabel label0[] = new BlokusPieceLabel[25];
     BlokusPieceLabel label1[] = new BlokusPieceLabel[25];
-
+    Piece putpiece;
+    String id;
+          
     /**
      * Creates new form GamePanels
      */
@@ -70,28 +81,20 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
     public void init() throws IOException {
         //this.messageDialog = new TextMessageDialog(this,false);
         //this.showMessageDialog();
-        BoardClickListener bcl = new BoardClickListener();      
+        //selected.setLocation(0, 0);
+        this.usedPeices = new ArrayList<String>();
+        this.havingPeices = new ArrayList<String>();
+        for(String pcid:Piece.PieceIDList){
+            this.havingPeices.add(pcid);
+        }
+        
         this.showRedPlayerPanel();
         this.showBluePlayerPanel();
-        
-        jPanel5 = new javax.swing.JPanel();
-        
-        jPanel5.setPreferredSize(new java.awt.Dimension(600, 600));
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 550, Short.MAX_VALUE)
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 550, Short.MAX_VALUE)
-        );
-        
+        BoardClickListener bcl = new BoardClickListener();      
+       
         this.boardPanels = new BlokusPiecePanel[Board.BOARDSIZE][Board.BOARDSIZE];
         this.jPanel4.setLayout(new GridLayout(Board.BOARDSIZE, Board.BOARDSIZE));
-        this.jPanel5.setBackground(Color.BLACK);
+        
         for (int i = 0; i < Board.BOARDSIZE; i++) {
             for (int j = 0; j < Board.BOARDSIZE; j++) {
                 boardPanels[i][j] = new BlokusPiecePanel();
@@ -123,6 +126,7 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
 
     }
 
+    
     public void showBluePlayerPanel() throws IOException {
         this.jPanel3.setLayout(new GridLayout(5, 5, 3, 3));
 
@@ -381,10 +385,43 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
         piece.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     }
 
+    public void clearboard(){
+        for (int i = 0; i < Board.BOARDSIZE; i++) {
+            for (int j = 0; j < Board.BOARDSIZE; j++) {
+              this.boardPanels[i][j].setColor(-1);
+            }
+        }   
+    }    
     public void drawboard() {
+        id = this.havingPeices.get(this.pieceIndex);
+        putpiece = new Piece(id);
+        int nowpiece[][] = putpiece.getPiecePattern();
+           
+        int width = nowpiece[0].length;
+        int hight = nowpiece.length;
+       
+        for (int i = 0 ;i < width; i++){
+            for (int j = 0 ;j < hight; j++){
+                if (i+selected.x<15&&j+selected.y<15){
+                  if(nowpiece[i][j] == 1){ 
+                   this.boardPanels[i+selected.x][j+selected.y].setColor(1);
+                  }
+                }
+             
+            }
+           
+        }
+        
 
     }
+    private void rotateClockwise(){
+        this.putpiece.setDirction(WIDTH);
+    }
 
+    private void rotateCounterClockwise(){
+        
+    }
+    
     private class PieceLabelClickListener implements MouseListener {
 
         @Override
@@ -484,9 +521,9 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
         }
 
         public void mouseExited(MouseEvent e) {
-            selected = null;
+            //selected = null;
           //  board.resetOverlay();
-            //drawBoard();
+            clearboard();
         }
 
         public void mouseDragged(MouseEvent e) {
@@ -494,21 +531,34 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
         }
 
         public void mouseMoved(MouseEvent e) {
-                BlokusPiecePanel bp = (BlokusPiecePanel) e.getComponent();
-                selected = bp.getpoint();
-                
+               
+               BlokusPiecePanel bp = (BlokusPiecePanel) e.getComponent();
+               System.out.println(selected);
+               System.out.println(bp.getpoint());
+               
+               if (!selected.equals(bp.getpoint())){
+                System.out.println("aaa");
+                   selected = bp.getpoint();
+                clearboard();
+                drawboard();
+               }
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (e.getWheelRotation() > 0) {
-            //    rotateClockwise();
+                rotateClockwise();
             } else {
-              //  rotateCounterClockwise();
+                rotateCounterClockwise();
             }
         }
 
     }
-
+    public void changevalue(){
+    
+        
+    }
+    
+    
     private javax.swing.JPanel jPanel5;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -529,4 +579,6 @@ public class GamePanels extends javax.swing.JFrame implements Observer {
     public void update(Observable o, Object arg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+   
+    
 }
