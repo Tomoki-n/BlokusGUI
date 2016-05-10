@@ -5,6 +5,7 @@
  */
 package blokusgui;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -20,15 +21,11 @@ public class BlokusGUI {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-    
-      
-
-        JFrame main = new JFrame();
-        main.setVisible(true);
-        Init test = new Init(main, true);
-        test.setVisible(true);   
-        // TODO code application logic here
+    public static void main(String[] args) throws IOException, InterruptedException {
+  
+       GameMain main = new GameMain();
+       
+       // TODO code application logic here
     }
     
     

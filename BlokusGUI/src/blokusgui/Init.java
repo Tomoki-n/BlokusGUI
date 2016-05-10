@@ -33,9 +33,9 @@ public class Init extends javax.swing.JDialog {
         initComponents();
     }
 
-    private JTextField text1;
-    private JTextField text2;
-    private JTextField text3;
+    public JTextField text1;
+    public JTextField text2;
+    public JTextField text3;
 
     private  JLabel label1;
     private  JLabel label2;
@@ -86,6 +86,7 @@ public class Init extends javax.swing.JDialog {
                 }
             }
         });
+        
         JButton clearButton = new JButton("Clear");
         clearButton.addActionListener(new ActionListener() {
                                           @Override
@@ -102,12 +103,8 @@ public class Init extends javax.swing.JDialog {
     }
 
     public void OKButtonPressed(ActionEvent e) throws IOException {
-       Game game = new Game();
-       GamePanels panel = new GamePanels(game);
-       panel.setVisible(true);
        
-       
-       this.setVisible(false);
+       dispose();
     }
 
     public void ClearButtonPressed(ActionEvent e){

@@ -60,6 +60,9 @@ public class Piece {
     public String getPieceID(){
         return this.PieceID;
     }
+    public int getdirection(){
+        return this.direction;
+    }
     
     public String getPieceIDwithDirection(){
         return this.PieceID+"-"+this.direction;
